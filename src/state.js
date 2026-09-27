@@ -7,6 +7,8 @@ export const state = {
     detailActiveImgIndex: 0,
     activeDetailProduct: null,
     currentPage: 1,
+    currentUser: null,
+    userRole: null,
 };
 
 export const ITEMS_PER_PAGE = 12;

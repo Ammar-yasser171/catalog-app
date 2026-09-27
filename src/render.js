@@ -77,12 +77,13 @@ function createGridCard(product) {
                         <button onclick="openDetailModal('${product.id}')" class="p-2 text-slate-500 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-all" title="التفاصيل">
                             <i class="fa-solid fa-eye"></i>
                         </button>
+                        ${state.userRole === 'admin' ? `
                         <button onclick="openProductModal('${product.id}')" class="p-2 text-slate-500 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-all" title="تعديل">
                             <i class="fa-solid fa-pen-to-square"></i>
                         </button>
                         <button onclick="deleteProduct('${product.id}')" class="p-2 text-slate-500 hover:text-red-600 dark:hover:text-red-400 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-all" title="حذف">
                             <i class="fa-solid fa-trash-can"></i>
-                        </button>
+                        </button>` : ''}
                     </div>
                 </div>
             </div>
@@ -122,17 +123,18 @@ function createListCard(product) {
                     <span class="text-lg font-black text-emerald-600 dark:text-emerald-400">${product.price} <span class="text-xs font-normal">ج.م</span></span>
                 </div>
 
-                <div class="flex items-center gap-1">
-                    <button onclick="openDetailModal('${product.id}')" class="p-2 text-slate-500 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg" title="التفاصيل">
-                        <i class="fa-solid fa-eye"></i>
-                    </button>
-                    <button onclick="openProductModal('${product.id}')" class="p-2 text-slate-500 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg" title="تعديل">
-                        <i class="fa-solid fa-pen-to-square"></i>
-                    </button>
-                    <button onclick="deleteProduct('${product.id}')" class="p-2 text-slate-500 hover:text-red-600 dark:hover:text-red-400 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg" title="حذف">
-                        <i class="fa-solid fa-trash-can"></i>
-                    </button>
-                </div>
+                    <div class="flex items-center gap-1">
+                        <button onclick="openDetailModal('${product.id}')" class="p-2 text-slate-500 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-all" title="التفاصيل">
+                            <i class="fa-solid fa-eye"></i>
+                        </button>
+                        ${state.userRole === 'admin' ? `
+                        <button onclick="openProductModal('${product.id}')" class="p-2 text-slate-500 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-all" title="تعديل">
+                            <i class="fa-solid fa-pen-to-square"></i>
+                        </button>
+                        <button onclick="deleteProduct('${product.id}')" class="p-2 text-slate-500 hover:text-red-600 dark:hover:text-red-400 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-all" title="حذف">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>` : ''}
+                    </div>
             </div>
         </div>
     `;

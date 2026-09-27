@@ -33,7 +33,15 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 min-h-screen transition-colors duration-200">
-
+    <div id="loginScreen" class="fixed inset-0 z-[100] flex items-center justify-center bg-slate-50 dark:bg-slate-900">
+        <form id="loginForm" class="bg-white dark:bg-slate-800 p-8 rounded-2xl shadow-lg w-full max-w-sm space-y-4 border border-slate-200 dark:border-slate-700">
+            <h2 class="text-xl font-bold text-center text-slate-900 dark:text-white">تسجيل الدخول</h2>
+            <input type="email" id="loginEmail" required placeholder="البريد الإلكتروني" class="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500">
+            <input type="password" id="loginPassword" required placeholder="كلمة المرور" class="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500">
+            <p id="loginError" class="text-red-500 text-xs text-center hidden">بيانات الدخول غير صحيحة</p>
+            <button type="submit" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-semibold">دخول</button>
+        </form>
+    </div>
     <!-- Header / Navbar -->
     <header class="sticky top-0 z-30 bg-white/90 dark:bg-slate-800/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-700 shadow-sm">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -54,19 +62,21 @@
                     <button id="themeToggleBtn" class="p-2.5 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-xl transition-all" title="تبديل المظهر">
                         <i id="themeIcon" class="fa-solid fa-moon text-lg"></i>
                     </button>
-                    
+                    <button id="logoutBtn" class="p-2.5 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-xl transition-all" title="تسجيل الخروج">
+                        <i class="fa-solid fa-right-from-bracket text-lg"></i>
+                    </button>
                     <button id="exportDataBtn" class="px-3 py-2 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 rounded-xl text-xs sm:text-sm font-semibold flex items-center gap-1.5 transition-all">
                         <i class="fa-solid fa-file-export"></i>
                         <span class="hidden md:inline">تصدير</span>
                     </button>
 
-                    <button id="importDataBtn" class="px-3 py-2 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 rounded-xl text-xs sm:text-sm font-semibold flex items-center gap-1.5 transition-all">
+                    <button id="importDataBtn" data-admin-only class="hidden px-3 py-2 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 rounded-xl text-xs sm:text-sm font-semibold flex items-center gap-1.5 transition-all">
                         <i class="fa-solid fa-file-import"></i>
                         <span class="hidden md:inline">استيراد</span>
                     </button>
                     <input type="file" id="importFileInput" class="hidden" accept=".json">
 
-                    <button id="openAddModalBtn" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs sm:text-sm font-semibold flex items-center gap-2 shadow-md shadow-emerald-600/20 transition-all hover:scale-[1.02] active:scale-95">
+                    <button id="openAddModalBtn" data-admin-only class="hidden px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs sm:text-sm font-semibold flex items-center gap-2 shadow-md shadow-emerald-600/20 transition-all hover:scale-[1.02] active:scale-95">
                         <i class="fa-solid fa-plus"></i>
                         <span>إضافة منتج</span>
                     </button>
@@ -362,10 +372,10 @@
                 <div class="border-t border-slate-200 dark:border-slate-700 pt-4 flex items-center justify-between text-xs text-slate-400">
                     <span id="detailCreatedAt"></span>
                     <div class="flex gap-2">
-                        <button id="detailEditBtn" class="px-4 py-2 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 rounded-xl font-semibold transition-all flex items-center gap-1.5">
+                        <button id="detailEditBtn" data-admin-only class="px-4 py-2 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 rounded-xl font-semibold transition-all flex items-center gap-1.5">
                             <i class="fa-solid fa-pen-to-square"></i> تعديل
                         </button>
-                        <button id="detailDeleteBtn" class="px-4 py-2 bg-red-50 dark:bg-red-900/30 hover:bg-red-100 dark:hover:bg-red-900/50 text-red-600 dark:text-red-400 rounded-xl font-semibold transition-all flex items-center gap-1.5">
+                        <button id="detailDeleteBtn" data-admin-only class="px-4 py-2 bg-red-50 dark:bg-red-900/30 hover:bg-red-100 dark:hover:bg-red-900/50 text-red-600 dark:text-red-400 rounded-xl font-semibold transition-all flex items-center gap-1.5">
                             <i class="fa-solid fa-trash-can"></i> حذف
                         </button>
                     </div>

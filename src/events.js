@@ -1,4 +1,6 @@
 // ربط كل مستمعي الأحداث (event listeners) بعناصر الواجهة
+import { signIn, signOut, applyRoleUI } from './auth.js';
+import { loadAppData } from './main.js';
 import { state } from './state.js';
 import { toggleTheme } from './theme.js';
 import { applyFilters, setViewMode } from './filters.js';
@@ -16,6 +18,27 @@ import { exportDataJSON, importDataJSON } from './exportImport.js';
 import { ITEMS_PER_PAGE } from './state.js';
 
 export function setupEventListeners() {
+        // Login / Logout
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('loginEmail').value.trim();
+        const password = document.getElementById('loginPassword').value;
+        const errorEl = document.getElementById('loginError');
+        errorEl.classList.add('hidden');
+        try {
+            await signIn(email, password);
+            document.getElementById('loginScreen').classList.add('hidden');
+            applyRoleUI();
+            await loadAppData();
+        } catch (err) {
+            errorEl.classList.remove('hidden');
+        }
+    });
+
+    document.getElementById('logoutBtn').addEventListener('click', async () => {
+        await signOut();
+        location.reload();
+    });
     // Theme toggle
     document.getElementById('themeToggleBtn').addEventListener('click', toggleTheme);
 
