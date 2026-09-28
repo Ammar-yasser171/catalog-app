@@ -95,6 +95,9 @@ export function setupEventListeners() {
     document.getElementById('addUrlImgBtn').addEventListener('click', handleAddUrlImage);
     document.getElementById('fileImageInput').addEventListener('change', handleFileUpload);
 
+    document.getElementById('openFilePickerBtn')?.addEventListener('click', () => {
+        document.getElementById('fileImageInput').click();
+    });
     // Form Submit
     document.getElementById('productForm').addEventListener('submit', handleFormSubmit);
 
