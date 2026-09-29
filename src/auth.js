@@ -19,7 +19,8 @@ export async function getSession() {
 }
 
 export async function loadCurrentUserProfile() {
-    const { data: { user } } = await supabaseClient.auth.getUser();
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    const user = session?.user ?? null;
     if (!user) {
         state.currentUser = null;
         state.userRole = null;

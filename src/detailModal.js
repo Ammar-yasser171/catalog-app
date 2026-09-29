@@ -1,10 +1,11 @@
 // نافذة تفاصيل المنتج (المعرض والحذف)
 import { state } from './state.js';
-import { deleteProductRow, loadProducts } from './api.js';
+import { deleteProductRow, deleteImagesFromStorage } from './api.js';
 import { showToast } from './toast.js';
 import { applyFilters } from './filters.js';
 import { renderCategoryOptions } from './render.js';
 import { openProductModal } from './productModal.js';
+import { FALLBACK_IMG, escapeHtml, thumbOf } from './utils.js';
 
 export function openDetailModal(id) {
     const product = state.products.find(p => p.id === id);
@@ -43,13 +44,14 @@ export function updateDetailGallery() {
     const product = state.activeDetailProduct;
     if (!product) return;
 
-    const fallbackImg = 'https://placehold.co/600x400/e2e8f0/64748b?text=%D0%B1%D8%AF%D9%88%D9%86+%D8%B5%D9%88%D8%B1%D8%A9';
-    const images = (product.images && product.images.length > 0) ? product.images : [fallbackImg];
+    const images = (product.images && product.images.length > 0) ? product.images : [FALLBACK_IMG];
 
     if (state.detailActiveImgIndex >= images.length) state.detailActiveImgIndex = 0;
     if (state.detailActiveImgIndex < 0) state.detailActiveImgIndex = images.length - 1;
 
-    document.getElementById('detailMainImg').src = images[state.detailActiveImgIndex];
+    const mainImgEl = document.getElementById('detailMainImg');
+    mainImgEl.onerror = () => { mainImgEl.onerror = null; mainImgEl.src = FALLBACK_IMG; };
+    mainImgEl.src = images[state.detailActiveImgIndex];
     document.getElementById('detailImgBadge').innerText = `${state.detailActiveImgIndex + 1} / ${images.length}`;
 
     // Render Thumbnails
@@ -58,7 +60,7 @@ export function updateDetailGallery() {
         thumbsContainer.classList.remove('hidden');
         thumbsContainer.innerHTML = images.map((img, idx) => `
             <button onclick="setDetailActiveImage(${idx})" class="w-14 h-14 rounded-lg overflow-hidden border-2 flex-shrink-0 ${idx === state.detailActiveImgIndex ? 'border-emerald-500 scale-105' : 'border-transparent opacity-60'} transition-all">
-                <img src="${img}" class="w-full h-full object-cover">
+                <img src="${escapeHtml(thumbOf(img))}" data-full="${escapeHtml(img)}" loading="lazy" decoding="async" onerror="handleImgError(this)" class="w-full h-full object-cover">
             </button>
         `).join('');
     } else {
@@ -77,17 +79,20 @@ export function navigateDetailImage(direction) {
 }
 
 export async function deleteProduct(id) {
-    if (confirm("هل أنت تأكد من إزالة هذا المنتج من الكتالوج؟")) {
-        try {
-            await deleteProductRow(id);
-            await loadProducts();
-            renderCategoryOptions();
-            applyFilters();
-            closeDetailModal();
-            showToast("تم حذف المنتج.", "info");
-        } catch (err) {
-            console.error(err);
-            showToast("حدث خطأ أثناء الحذف من قاعدة البيانات.", "error");
-        }
+    if (!confirm("هل أنت تأكد من إزالة هذا المنتج من الكتالوج؟")) return;
+
+    // نحفظ روابط الصور قبل الحذف
+    const images = [...(state.products.find(p => p.id === id)?.images || [])];
+
+    try {
+        await deleteProductRow(id);
+        await deleteImagesFromStorage(images); // بعد نجاح حذف الصف
+        renderCategoryOptions();
+        applyFilters();
+        closeDetailModal();
+        showToast("تم حذف المنتج.", "info");
+    } catch (err) {
+        console.error(err);
+        showToast("حدث خطأ أثناء الحذف من قاعدة البيانات.", "error");
     }
 }

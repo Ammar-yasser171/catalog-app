@@ -1,3 +1,14 @@
+@import "tailwindcss";
+
+/* الوضع الليلي يعتمد على كلاس dark على عنصر html (نفس السلوك القديم) */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Tailwind الجديد بيخلي لون الحدود الافتراضي currentColor، ده بيرجّعه للون الفاتح */
+@layer base {
+    *, ::after, ::before, ::backdrop, ::file-selector-button {
+        border-color: var(--color-slate-200, currentColor);
+    }
+}
 body {
     font-family: 'Cairo', sans-serif;
 }

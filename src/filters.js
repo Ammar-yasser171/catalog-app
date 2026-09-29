@@ -10,7 +10,7 @@ export function applyFilters() {
 
     state.filteredProducts = state.products.filter(item => {
         const matchesSearch = item.name.toLowerCase().includes(query) ||
-                              item.category.toLowerCase().includes(query) ||
+                              (item.category || '').toLowerCase().includes(query) ||
                               (item.description && item.description.toLowerCase().includes(query));
         const matchesCategory = !category || item.category === category;
         const matchesUnit = !unit || item.unitType === unit;

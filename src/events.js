@@ -50,9 +50,11 @@ export function setupEventListeners() {
 
     // Search and Filters
     const searchInput = document.getElementById('searchInput');
+    let searchTimer;
     searchInput.addEventListener('input', () => {
         document.getElementById('clearSearchBtn').classList.toggle('hidden', !searchInput.value);
-        applyFilters();
+        clearTimeout(searchTimer);
+        searchTimer = setTimeout(applyFilters, 200); // ينتظر 200ms بعد آخر حرف
     });
     document.getElementById('clearSearchBtn').addEventListener('click', () => {
         searchInput.value = '';

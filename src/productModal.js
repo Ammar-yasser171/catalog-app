@@ -1,6 +1,5 @@
 // نافذة إضافة/تعديل منتج
 import { state } from './state.js';
-import { insertProduct, updateProduct, loadProducts } from './api.js';
 import { showToast } from './toast.js';
 import { applyFilters } from './filters.js';
 import { renderCategoryOptions } from './render.js';
@@ -67,19 +66,21 @@ export function handleAddUrlImage() {
     renderModalImagesPreview();
 }
 
-export function handleFileUpload(e) {
+import { insertProduct, updateProduct, uploadImage, deleteImagesFromStorage } from './api.js';
+export async function handleFileUpload(e) {
     const files = Array.from(e.target.files);
     if (!files.length) return;
-
-    files.forEach(file => {
-        const reader = new FileReader();
-        reader.onload = (event) => {
-            state.currentModalImages.push(event.target.result);
-            renderModalImagesPreview();
-        };
-        reader.readAsDataURL(file);
-    });
     e.target.value = '';
+
+    showToast("جاري رفع الصور...", "info");
+    try {
+        const urls = await Promise.all(files.map(uploadImage));
+        state.currentModalImages.push(...urls);
+        renderModalImagesPreview();
+    } catch (err) {
+        console.error(err);
+        showToast("فشل رفع الصور.", "error");
+    }
 }
 
 export function removeModalImage(index) {
@@ -107,6 +108,9 @@ function renderModalImagesPreview() {
 export async function handleFormSubmit(e) {
     e.preventDefault();
 
+    const submitBtn = e.submitter;
+    if (submitBtn) submitBtn.disabled = true; // منع الضغط المزدوج
+
     const id = document.getElementById('productId').value;
     const name = document.getElementById('inputName').value.trim();
     const category = document.getElementById('inputCategory').value.trim();
@@ -114,11 +118,9 @@ export async function handleFormSubmit(e) {
     const unitType = document.querySelector('input[name="unitType"]:checked').value;
     const description = document.getElementById('inputDescription').value.trim();
 
-    let images = state.currentModalImages;
-    if (id && state.currentModalImages.length === 0) {
-        const existing = state.products.find(p => p.id === id);
-        images = existing ? existing.images : [];
-    }
+    // بالظبط الصور اللي ظاهرة في المعاينة (حتى لو فاضية).
+    // تم حذف الكود القديم اللي كان بيرجّع الصور القديمة لما القائمة تبقى فاضية، وده كان سبب المشكلة.
+    const images = [...state.currentModalImages];
 
     const row = {
         title: name,
@@ -131,18 +133,23 @@ export async function handleFormSubmit(e) {
 
     try {
         if (id) {
+            const oldImages = state.products.find(p => p.id === id)?.images || [];
             await updateProduct(id, row);
+            // حذف الملفات المُزالة من Storage (بعد نجاح التحديث)
+            const removed = oldImages.filter(u => !images.includes(u));
+            await deleteImagesFromStorage(removed);
             showToast("تم تعديل المنتج بنجاح!", "success");
         } else {
             await insertProduct(row);
             showToast("تمت إضافة المنتج بنجاح!", "success");
         }
-        await loadProducts();
         renderCategoryOptions();
         applyFilters();
         closeProductModal();
     } catch (err) {
         console.error(err);
         showToast("حدث خطأ أثناء الحفظ في قاعدة البيانات.", "error");
+    } finally {
+        if (submitBtn) submitBtn.disabled = false;
     }
 }
